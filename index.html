@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steerable Video-to-Ambisonics Spatialization — demo page</title>
+<style>
+:root{--fg:#1d1d1f;--muted:#5c5c66;--bg:#ffffff;--card:#f6f6f8;--line:#e2e2e8;--accent:#2b5bd7}
+@media (prefers-color-scheme:dark){:root{--fg:#eaeaf0;--muted:#a3a3b0;--bg:#121216;--card:#1c1c22;--line:#2c2c34;--accent:#7ea2ff}}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:30px;line-height:1.2;margin:0 0 8px} h2{font-size:22px;margin:40px 0 12px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.authors{font-size:17px;margin:6px 0} .affil{color:var(--muted);font-size:14px;margin:2px 0}
+.links a{display:inline-block;margin:10px 8px 0 0;padding:7px 14px;border:1px solid var(--accent);border-radius:20px;color:var(--accent);text-decoration:none;font-weight:600}
+.abstract{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px}
+.fig{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start} .fig figure{margin:0;flex:1 1 320px} .fig img{width:100%;border:1px solid var(--line);border-radius:8px;background:#fff}
+figcaption{font-size:14px;color:var(--muted);margin-top:6px}
+.ex{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:18px 0}
+.ex h3{margin:0 0 10px;font-size:17px} .ex h4{margin:14px 0 6px;font-size:15px;color:var(--muted)}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.cell{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px} .cell .name{font-weight:600;font-size:14px;margin-bottom:6px}
+.cell img{width:100%;border-radius:6px} .cell audio{width:100%;margin-top:6px} .cell a{font-size:12px;color:var(--accent)}
+video{width:100%;max-width:640px;border-radius:10px;border:1px solid var(--line)}
+.note{font-size:14px;color:var(--muted)} code,pre{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px} pre{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;overflow:auto}
+table{border-collapse:collapse;font-size:14px} td,th{border:1px solid var(--line);padding:5px 9px;text-align:center} th{background:var(--card)}
+ul{padding-left:20px} li{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Steerable Video-to-Ambisonics Spatialization: Faithful Direction Control and How Precise It Needs to Be</h1>
+<p class="authors">Liming Liang, Lingfeng Yang, Luo Chen, Yuguo Yin, Zihan Xiong, Yuexian Zou</p>
+<p class="affil">School of Electronic and Computer Engineering, Peking University, Shenzhen · Guangdong Provincial Key Laboratory of Ultra High Definition Immersive Media Technology, Shenzhen Graduate School, Peking University · South China University of Technology</p>
+<p class="affil">Submitted to ICASSP 2027</p>
+<div class="links"><a href="#" id="link-paper">Paper (PDF)</a><a href="#" id="link-arxiv">arXiv</a><a href="#examples">Steering examples</a></div>
+
+<h2>Abstract</h2>
+<div class="abstract">Video-to-ambisonics models for 360-degree video are conditioned on a source direction, an oracle on the YT-Ambigen benchmark. Deployed, the direction comes from a user or a localizer, so the model should treat it as a <em>control</em>: put the sound where it says, anywhere on the sphere, and degrade gracefully when it is imprecise. Neither property has been measured. We propose a steerability protocol built on the exact rotation group of first-order ambisonics, which needs no annotation: an equivariance test, a follow test with random targets, and a control-precision curve. A spatializer trained on ground-truth directions is only approximately steerable: its peak follows a random target in 91% of the clips, but its field turns diffuse away from the training data's frontal directions. <em>Rotation-consistency training</em>, a free augmentation, makes the control exact (100% of targets, median 3°) and raises the benchmark score from CC 0.783 to 0.805. The precision curve of a faithful model is a data-only bound scaled by its accuracy: 30° of error costs 0.13 CC, a click on a 7×14 grid 0.015, and beyond 47° a direction is worse than none, so a leak-free panoramic localizer with 58° median error does not help.</div>
+
+<h2>Results at a glance</h2>
+<table>
+<tr><th>Spatializer</th><th>CC, true direction</th><th>CC, equivariance test</th><th>Random target within 30°</th><th>Median follow error</th></tr>
+<tr><td>standard training (GT directions)</td><td>0.783</td><td>0.742</td><td>91%</td><td>13°</td></tr>
+<tr><td>+ azimuth rotation consistency</td><td>0.797</td><td>0.801</td><td>98%</td><td>10°</td></tr>
+<tr><td><b>+ SO(3) rotation consistency</b></td><td><b>0.805</b></td><td><b>0.805</b></td><td><b>100%</b></td><td><b>3°</b></td></tr>
+<tr><td>+ azimuth rotation + 15° jitter</td><td>0.786</td><td>0.785</td><td>56%</td><td>27°</td></tr>
+</table>
+<div class="fig">
+<figure><img src="figs/fig_curve.png" alt="control-precision curve"><figcaption>Control-precision curve: full-clip CC vs. the angular error of the direction input; dash-dotted = bound (ground truth rotated by δ), dashed = no direction (FoV-only model).</figcaption></figure>
+<figure><img src="figs/fig_steer.png" alt="follow test"><figcaption>Follow test: fraction of clips whose predicted peak lies within 30° of a uniform random target, by target azimuth and elevation.</figcaption></figure>
+<figure><img src="figs/fig_examples.png" alt="steering one clip"><figcaption>Steering one clip: energy maps of the rotated ground truth (top), the standard model (middle) and the SO(3)-consistent model (bottom) for direction inputs rotated by 0/90/180/270°.</figcaption></figure>
+</div>
+
+<h2 id="examples">Steering examples (test clips)</h2>
+<p class="note">For each clip the SO(3)-consistent spatializer receives the true direction rotated about the vertical axis by 0°, 90°, 180° and 270° (the video and the mono input are unchanged). Listen with headphones: the source should move around you, and the energy map should match the rotated ground truth shown next to it. The standard model is shown at 0° and 180°: its peak moves, but away from the front the field turns diffuse. Stereo renders use a virtual cardioid pair (L = W + Y, R = W − Y); the 4-channel FOA files (ACN/SN3D, 16 kHz) are provided for download. Clips were chosen so that the true source lies in front, to the left, to the right and behind the camera.</p>
+<div id="examples-root"></div>
+
+<h2>Citation</h2>
+<pre>@inproceedings{liang2027steerable,
+  title     = {Steerable Video-to-Ambisonics Spatialization: Faithful Direction Control and How Precise It Needs to Be},
+  author    = {Liming Liang and Lingfeng Yang and Luo Chen and Yuguo Yin and Zihan Xiong and Yuexian Zou},
+  booktitle = {Proc. IEEE Int. Conf. Acoustics, Speech and Signal Processing (ICASSP)},
+  year      = {2027}, note = {submitted}
+}</pre>
+<p class="note">Acknowledgement: this work is supported by Guangdong Provincial Key Laboratory of Ultra High Definition Immersive Media Technology (Grant No. 2024B1212010006) and financially supported by Shenzhen Science and Technology Program (Grant No. SYSPG20241211173440004). Data: YT-Ambigen (Kim et al., ICLR 2025); only short test excerpts are shown here for research purposes.</p>
+</div>
+<script>
+const ANGLES = [0, 90, 180, 270];
+fetch("examples.json").then(r => r.json()).then(list => {
+  const root = document.getElementById("examples-root");
+  list.forEach((e, i) => {
+    const side = Math.abs(e.az) < 45 ? "in front of" : Math.abs(e.az) > 135 ? "behind" : (e.az < 0 ? "to the left of" : "to the right of");
+    const cell = (tag, name) => `<div class="cell"><div class="name">${name}</div><img src="media/${e.id}_${tag}_map.png" alt="${name}">
+        <audio controls preload="none" src="media/${e.id}_${tag}.m4a"></audio><div><a href="media/${e.id}_${tag}_foa.wav" download>FOA (4-ch WAV)</a></div></div>`;
+    const ex = document.createElement("div"); ex.className = "ex";
+    ex.innerHTML = `<h3>Example ${i + 1}: clip <code>${e.id}</code> — true source ${side} the camera (azimuth ${e.az.toFixed(0)}°)</h3>
+      <video src="media/${e.id}.mp4" poster="media/${e.id}.jpg" controls muted loop playsinline></video>
+      <p class="note">Mono input W: <audio controls preload="none" src="media/${e.id}_mono.m4a"></audio></p>
+      <h4>Ground truth and SO(3)-consistent spatializer driven by the rotated direction</h4>
+      <div class="row">${cell("gt", "ground truth (0°)")}${ANGLES.map(t => cell("rot3d_" + t, "SO(3) model, direction +" + t + "°")).join("")}</div>
+      <h4>Reference: ground truth rotated by the same angles</h4>
+      <div class="row">${ANGLES.map(t => cell("gtrot_" + t, "ground truth rotated by " + t + "°")).join("")}</div>
+      <h4>Standard model (trained on ground-truth directions only)</h4>
+      <div class="row">${cell("base_0", "standard model, direction +0°")}${cell("base_180", "standard model, direction +180°")}</div>`;
+    root.appendChild(ex);
+  });
+});
+</script>
+</body>
+</html>

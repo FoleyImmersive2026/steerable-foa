@@ -1,0 +1,70 @@
+[
+ {
+  "id": "tENB2euDcB4_14",
+  "az": -167.14285709413548,
+  "variants": [
+   "gt",
+   "rot3d_0",
+   "gtrot_0",
+   "rot3d_90",
+   "gtrot_90",
+   "rot3d_180",
+   "gtrot_180",
+   "rot3d_270",
+   "gtrot_270",
+   "base_0",
+   "base_180"
+  ]
+ },
+ {
+  "id": "rlCf6Y5Xap8_168",
+  "az": -90.0,
+  "variants": [
+   "gt",
+   "rot3d_0",
+   "gtrot_0",
+   "rot3d_90",
+   "gtrot_90",
+   "rot3d_180",
+   "gtrot_180",
+   "rot3d_270",
+   "gtrot_270",
+   "base_0",
+   "base_180"
+  ]
+ },
+ {
+  "id": "tQAMw7y-8NY_61",
+  "az": -38.571429199285674,
+  "variants": [
+   "gt",
+   "rot3d_0",
+   "gtrot_0",
+   "rot3d_90",
+   "gtrot_90",
+   "rot3d_180",
+   "gtrot_180",
+   "rot3d_270",
+   "gtrot_270",
+   "base_0",
+   "base_180"
+  ]
+ },
+ {
+  "id": "AKcNTAQ0f7g_37",
+  "az": 90.0,
+  "variants": [
+   "gt",
+   "rot3d_0",
+   "gtrot_0",
+   "rot3d_90",
+   "gtrot_90",
+   "rot3d_180",
+   "gtrot_180",
+   "rot3d_270",
+   "gtrot_270",
+   "base_0",
+   "base_180"
+  ]
+ }
+]
